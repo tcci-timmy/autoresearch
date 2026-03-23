@@ -21,3 +21,10 @@ dev/
 
 # Results file
 results.tsv
+
+# Time series autoresearch artifacts
+results_ts.tsv
+data/best_predictions/
+prediction_chart.png
+prediction_best.png
+run_ts.log
