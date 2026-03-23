@@ -14,7 +14,7 @@ import torch
 # Hyperparameters (agent edits these)
 # ---------------------------------------------------------------------------
 
-CONTEXT_LENGTH = 512
+CONTEXT_LENGTH = 1024
 PREDICTION_LENGTH = 96
 MODEL_PATH = "ibm-granite/granite-timeseries-ttm-r2"
 FEATURE_COLS = []
