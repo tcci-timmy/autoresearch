@@ -21,8 +21,8 @@ FEATURE_COLS = []
 TARGET_COL = "1KTI10 熟料落料溫度"
 RESAMPLE_INTERVAL = None
 CHANNEL_MODE = "independent"
-FINETUNE_EPOCHS = 0
-FINETUNE_LR = 0.001
+FINETUNE_EPOCHS = 1
+FINETUNE_LR = 0.0001
 FINETUNE_BATCH_SIZE = 32
 
 # ---------------------------------------------------------------------------
