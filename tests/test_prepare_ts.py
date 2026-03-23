@@ -61,3 +61,31 @@ def test_standard_scale_constant_column():
     assert params["const"]["std"] == 1.0
     assert (scaled_train["const"] == 0.0).all()
     assert abs(scaled_train["vary"].mean()) < 0.01
+
+
+def test_evaluate_mae():
+    from prepare_ts import evaluate_mae, TARGET_COL
+    scaler_params = {TARGET_COL: {"mean": 800.0, "std": 0.5}}
+    predictions = np.array([0.0, 0.0, 0.0])
+    actuals = np.array([0.0, 2.0, -2.0])
+    mae = evaluate_mae(predictions, actuals, scaler_params)
+    assert abs(mae - 0.6667) < 0.001
+
+
+def test_make_sliding_windows():
+    from prepare_ts import make_sliding_windows, TARGET_COL
+    n = 100
+    idx = pd.date_range("2026-01-01", periods=n, freq="5s")
+    df = pd.DataFrame({
+        "feature_a": np.arange(n, dtype=float),
+        TARGET_COL: np.arange(n, dtype=float) * 0.1,
+    }, index=idx)
+    context_length = 20
+    prediction_length = 10
+    windows = make_sliding_windows(df, context_length, prediction_length, TARGET_COL)
+    assert len(windows) == 8
+    inp, tgt = windows[0]
+    assert inp.shape == (context_length, 2)
+    assert tgt.shape == (prediction_length,)
+    assert abs(tgt[0] - 2.0) < 0.001
+    assert abs(tgt[-1] - 2.9) < 0.001

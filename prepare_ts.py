@@ -59,3 +59,37 @@ def standard_scale(train_df, val_df):
         scaled_train[col] = (train_df[col] - mean) / std
         scaled_val[col] = (val_df[col] - mean) / std
     return scaled_train, scaled_val, scaler_params
+
+# ---------------------------------------------------------------------------
+# Evaluation
+# ---------------------------------------------------------------------------
+
+def evaluate_mae(predictions, actuals, scaler_params, target_col=TARGET_COL):
+    """Inverse-scale predictions and actuals, compute MAE in degrees Celsius."""
+    mean = scaler_params[target_col]["mean"]
+    std = scaler_params[target_col]["std"]
+    preds_orig = predictions * std + mean
+    actuals_orig = actuals * std + mean
+    return float(np.mean(np.abs(preds_orig - actuals_orig)))
+
+# ---------------------------------------------------------------------------
+# Sliding windows
+# ---------------------------------------------------------------------------
+
+def make_sliding_windows(scaled_df, context_length, prediction_length, target_col=TARGET_COL):
+    """Create sliding window samples. Stride = prediction_length (non-overlapping).
+    Returns list of (input_window, target_window) tuples.
+    input_window: numpy array (context_length, n_features)
+    target_window: 1-D numpy array (prediction_length,) for target col only
+    """
+    data = scaled_df.values
+    target_idx = list(scaled_df.columns).index(target_col)
+    n = len(data)
+    windows = []
+    start = 0
+    while start + context_length + prediction_length <= n:
+        inp = data[start:start + context_length]
+        tgt = data[start + context_length:start + context_length + prediction_length, target_idx]
+        windows.append((inp, tgt))
+        start += prediction_length
+    return windows
