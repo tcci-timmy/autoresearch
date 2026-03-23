@@ -89,3 +89,27 @@ def test_make_sliding_windows():
     assert tgt.shape == (prediction_length,)
     assert abs(tgt[0] - 2.0) < 0.001
     assert abs(tgt[-1] - 2.9) < 0.001
+
+
+def test_save_and_load_best_predictions(tmp_path):
+    from prepare_ts import save_best_prediction, load_best_predictions
+    results_path = tmp_path / "results_ts.tsv"
+    results_path.write_text(
+        "commit\tval_mae\tstatus\tdescription\n"
+        "abc1234\t0.150000\tkeep\tbaseline\n"
+        "def5678\t0.120000\tkeep\tresample 15s\n"
+        "ghi9012\t0.200000\tdiscard\tbad idea\n"
+    )
+    best_dir = tmp_path / "best_predictions"
+    timestamps_a = np.array([1.0, 2.0, 3.0])
+    preds_a = np.array([800.1, 800.2, 800.3])
+    timestamps_b = np.array([1.0, 2.0, 3.0])
+    preds_b = np.array([800.0, 800.1, 800.2])
+    save_best_prediction("abc1234", preds_a, timestamps_a, best_dir=str(best_dir))
+    save_best_prediction("def5678", preds_b, timestamps_b, best_dir=str(best_dir))
+    bests = load_best_predictions(top_n=2, results_path=str(results_path), best_dir=str(best_dir))
+    assert len(bests) == 2
+    assert bests[0][0] == "def5678"
+    assert bests[0][1] == 0.120000
+    assert bests[1][0] == "abc1234"
+    assert np.array_equal(bests[0][3], preds_b)

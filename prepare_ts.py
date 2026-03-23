@@ -93,3 +93,37 @@ def make_sliding_windows(scaled_df, context_length, prediction_length, target_co
         windows.append((inp, tgt))
         start += prediction_length
     return windows
+
+# ---------------------------------------------------------------------------
+# Best prediction I/O
+# ---------------------------------------------------------------------------
+
+
+def save_best_prediction(commit_hash, predictions, timestamps, best_dir=BEST_PREDICTIONS_DIR):
+    """Save prediction array and timestamps to best_predictions directory."""
+    os.makedirs(best_dir, exist_ok=True)
+    np.save(os.path.join(best_dir, f"{commit_hash}.npy"), predictions)
+    np.save(os.path.join(best_dir, f"{commit_hash}_timestamps.npy"), timestamps)
+
+
+def load_best_predictions(top_n=3, results_path=RESULTS_PATH, best_dir=BEST_PREDICTIONS_DIR):
+    """Read results_ts.tsv, find top-N best by val_mae (ascending).
+    Returns [(commit, mae, description, predictions, timestamps), ...]
+    """
+    if not os.path.exists(results_path):
+        return []
+    df = pd.read_csv(results_path, sep="\t")
+    keeps = df[(df["status"] == "keep") & (df["val_mae"] > 0)].copy()
+    if keeps.empty:
+        return []
+    keeps = keeps.sort_values("val_mae").head(top_n)
+    results = []
+    for _, row in keeps.iterrows():
+        commit = row["commit"]
+        pred_path = os.path.join(best_dir, f"{commit}.npy")
+        ts_path = os.path.join(best_dir, f"{commit}_timestamps.npy")
+        if os.path.exists(pred_path) and os.path.exists(ts_path):
+            preds = np.load(pred_path, allow_pickle=True)
+            timestamps = np.load(ts_path, allow_pickle=True)
+            results.append((commit, row["val_mae"], row["description"], preds, timestamps))
+    return results
