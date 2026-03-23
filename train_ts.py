@@ -17,16 +17,8 @@ import torch
 CONTEXT_LENGTH = 512
 PREDICTION_LENGTH = 96
 MODEL_PATH = "ibm-granite/granite-timeseries-ttm-r2"
-FEATURE_COLS = [
-    "1KTI10 熟料落料溫度",
-    "1CPI18 窯頭風壓",
-    "1K001_ON 窯主馬達運轉",
-    "1KII01 旋窯主馬達A電流",
-    "1KII02 旋窯主馬達B電流",
-    "1KJI01 旋窯主馬達A功率",
-    "1KSI01 窯主馬達A轉速",
-]
-TARGET_COL = "1KTI09 燒成帶溫度"
+FEATURE_COLS = []
+TARGET_COL = "1KTI10 熟料落料溫度"
 RESAMPLE_INTERVAL = None
 CHANNEL_MODE = "independent"
 FINETUNE_EPOCHS = 0

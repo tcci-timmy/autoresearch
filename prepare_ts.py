@@ -13,7 +13,7 @@ import pandas as pd
 # Constants (fixed, do not modify)
 # ---------------------------------------------------------------------------
 
-TARGET_COL = "1KTI09 燒成帶溫度"
+TARGET_COL = "1KTI10 熟料落料溫度"
 TRAIN_RATIO = 0.8
 DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "kiln_data.csv")
 RESULTS_PATH = os.path.join(os.path.dirname(__file__), "results_ts.tsv")
